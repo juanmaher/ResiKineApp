@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.trivia.resikine.model.entity.Category;
 import com.trivia.resikine.R;
 import com.trivia.resikine.controller.HomeViewModel;
 import com.trivia.resikine.view.adapter.CategoryAdapter;

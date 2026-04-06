@@ -8,6 +8,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.trivia.resikine.R;
 import com.trivia.resikine.controller.QuizViewModel;
 import com.trivia.resikine.view.fragment.QuestionFragment;
 
@@ -29,11 +30,21 @@ public class QuizActivity extends AppCompatActivity {
 
         // Observamos cuando la trivia termina para ir a ResultActivity
         quizViewModel.getQuizFinished().observe(this, finished -> {
-            if (finished) {
+            // 1. "Early Return": Si es null, no hacemos nada y salimos del observer
+            if (finished == null) {
+                return;
+            }
+
+            // 2. Aquí Java ya sabe que 'finished' NO es null.
+            // El autounboxing a boolean primitivo es 100% seguro ahora.
+            if ((boolean) finished) {
                 Intent intent = new Intent(this, ResultActivity.class);
                 intent.putExtra("SCORE", quizViewModel.getScore());
                 intent.putExtra("CATEGORY_ID", categoryId);
                 startActivity(intent);
+
+                // Importante: removemos el observer o finalizamos para evitar
+                // que se dispare múltiples veces si la actividad se recrea.
                 finish();
             }
         });
@@ -66,5 +77,22 @@ public class QuizActivity extends AppCompatActivity {
                 .setPositiveButton("Salir", (d, w) -> finish())
                 .setNegativeButton("Cancelar", null)
                 .show();
+    }
+
+    public void nextQuestion() {
+        // Le pedimos al ViewModel que avance el índice
+        boolean hayMasPreguntas = quizViewModel.avanzarPregunta();
+
+        if (hayMasPreguntas) {
+            // Cargamos un NUEVO fragmento con la siguiente pregunta
+            getSupportFragmentManager().beginTransaction()
+                    .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left)
+                    .replace(R.id.fragment_container, new QuestionFragment())
+                    .commit();
+        } else {
+            // El ViewModel marcará quizFinished como true y el Observer de la Activity
+            // nos llevará a ResultActivity automáticamente.
+            quizViewModel.finalizarTrivia();
+        }
     }
 }

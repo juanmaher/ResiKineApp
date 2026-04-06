@@ -6,6 +6,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.trivia.resikine.R;
 import com.trivia.resikine.model.repository.TriviaRepository;
 
 public class ResultActivity extends AppCompatActivity {
